@@ -4,23 +4,23 @@ from pathlib import Path
 
 class BotDB:
 
-    def __init__(self, db_path_str):
-        self.path = Path(db_path_str)
-        self.conn = sqlite3.connect(path)
+    def __init__(self, db_path):
+        self.path = Path(db_path)
+        db_exists = self.path.exists()
+        self.conn = sqlite3.connect(self.path)
         cursor = self.conn.cursor()
 
-        if not self.db_path.exists():
+        if not db_exists:
             sql = open('init.sql', 'r').read()
             cursor.executescript(sql)
             self.conn.commit()
-
 
     def __del__(self):
         self.conn.close()
 
     def get_user(self, user_id):
         cursor = self.conn.cursor()
-        cursor.execute('SELECT * FROM users WHERE user_id=?', user_id)
+        cursor.execute('SELECT * FROM users WHERE user_id=?', (user_id,))
         user_tuple = cursor.fetchone()
         if user_tuple is None:
             return None
@@ -42,7 +42,7 @@ class BotDB:
 
     def get_user_reps(self, user_id):
         cursor = self.conn.cursor()
-        cursor.execute('SELECT exercise_name, COALESCE(reps, 0) as reps_coalesced FROM exercises RIGHT OUTER JOIN user_reps ON (exercises.exercise_name = user_reps.exercise_name) WHERE user_id=?', user_id)
+        cursor.execute('SELECT exercise_name, COALESCE(reps, 0) as reps_coalesced FROM exercises RIGHT OUTER JOIN user_reps ON (exercises.exercise_name = user_reps.exercise_name) WHERE user_id=?', (user_id,))
         return {exercise: reps for (exercise, reps) in cursor.fetchall()}
 
     def get_user_reps_for_exercise(self, user_id, exercise):
@@ -57,20 +57,20 @@ class BotDB:
         cursor = self.conn.cursor()
         cursor.execute("""
             INSERT INTO user_reps (user_id, exercise_name, reps) VALUES (?, ?, ?)
-            ON DUPLICATE KEY UPDATE user_id=user_id, exercise_name=exercise_name, reps=reps+?
+            ON CONFLICT(user_id, exercise_name) DO UPDATE SET reps=reps+?
             """, (user_id, exercise, reps, reps))
         self.conn.commit()
 
     def get_exercise_by_alias(self, alias):
         cursor = self.conn.cursor()
-        cursor.execute('SELECT exercise_name FROM exercise_aliases WHERE exercise_alias=?', alias)
+        cursor.execute('SELECT exercise_name FROM exercise_aliases WHERE exercise_alias=?', (alias,))
         return cursor.fetchone()
 
     def has_alias(self, alias):
         return self.get_exercise_by_alias(alias) is not None
 
     def has_exercise(self, alias):
-        return self.has_alias()
+        return self.has_alias(alias)
 
     def add_exercise(self, exercise, link=None):
         cursor = self.conn.cursor()
@@ -78,7 +78,7 @@ class BotDB:
         cursor.execute('INSERT INTO exercise_aliases (exercise_alias, exercise_name) VALUES (?, ?)', (exercise, exercise))
         self.conn.commit()
 
-    def add_alias(self, exercise, alias):
+    def add_alias(self, alias, exercise):
         cursor = self.conn.cursor()
         cursor.execute('INSERT INTO exercise_aliases (exercise_alias, exercise_name) VALUES (?, ?)', (alias, exercise))
         self.conn.commit()

@@ -55,7 +55,7 @@ async def add_alias(message: types.Message):
         await message.answer('Zu viele Argumente, du Otto.')
     else:
         alias, exercise = args
-        if bot_db.has_alias(exercise):
+        if bot_db.has_alias(alias):
             await message.answer('Der Alias {} existiert bereits.'.format(alias))
         elif not bot_db.has_exercise(exercise):
             await message.answer('Die Übung {} existiert nicht.'.format(exercise))

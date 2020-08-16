@@ -77,8 +77,8 @@ def tg_href(user_id, text):
 @dp.message_handler(commands=['todo', 'todos', 'zutun'])
 async def show_todos(message: types.Message):
     from_user = message['from']
-    if not bot_db.has_user(from_user['id']):
-        add_user(from_user['from'])
+    add_user(from_user)
+
     todos = bot_db.get_user_todo_reps(from_user['id'])
     dones = bot_db.get_user_reps(from_user['id'])
 

@@ -54,14 +54,15 @@ async def add_alias(message: types.Message):
     elif len(args) > 2:
         await message.answer('Zu viele Argumente, du Otto.')
     else:
-        alias, exercise = args
+        alias, exercise_alias = args
+        exercise = bot_db.get_exercise_by_alias(exercise_alias)
         if bot_db.has_alias(alias):
             await message.answer('Der Alias {} existiert bereits.'.format(alias))
-        elif not bot_db.has_exercise(exercise):
-            await message.answer('Die Übung {} existiert nicht.'.format(exercise))
+        elif exercise is None:
+            await message.answer('Die Übung {} existiert nicht.'.format(exercise_alias))
         else:
             bot_db.add_alias(alias, exercise)
-            await message.answer('{} oder {}? Alles das gleiche!'.format(alias, exercise))
+            await message.answer('{} oder {}? Alles das gleiche!'.format(alias, exercise_alias))
 
 
 def add_user(user):

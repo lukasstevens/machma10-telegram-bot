@@ -4,7 +4,7 @@ CREATE TABLE exercises (
 
 CREATE TABLE exercise_aliases (
     exercise_alias TEXT PRIMARY KEY NOT NULL,
-    exercise_name,
+    exercise_name TEXT NOT NULL,
     FOREIGN KEY (exercise_name) REFERENCES exercises(exercise_name)
 );
 
@@ -16,8 +16,8 @@ CREATE TABLE users (
 );
 
 CREATE TABLE user_reps (
-    user_id NOT NULL,
-    exercise_name NOT NULL,
+    user_id INTEGER NOT NULL,
+    exercise_name TEXT NOT NULL,
     reps INTEGER NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (exercise_name) REFERENCES exercises(exercise_name),

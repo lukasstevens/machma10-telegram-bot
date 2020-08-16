@@ -34,15 +34,27 @@ class BotDB:
 
     def get_max_reps(self):
         cursor = self.conn.cursor()
-        cursor.execute('SELECT exercise_name, MAX(reps) FROM user_reps GROUP BY exercise_name')
-        return {exercise: max_reps for (exercise, reps) in cursor.fetchall()}
+        cursor.execute("""
+            SELECT exercises.exercise_name, MAX(COALESCE(reps, 0))
+            FROM
+                exercises LEFT JOIN user_reps
+                ON exercises.exercise_name = user_reps.exercise_name
+            GROUP BY exercises.exercise_name
+            """)
+        return {exercise: reps for (exercise, reps) in cursor.fetchall()}
 
     def get_max_reps_for_exercise(self, exercise):
         return self.get_max_reps()[exercise]
 
     def get_user_reps(self, user_id):
         cursor = self.conn.cursor()
-        cursor.execute('SELECT exercise_name, COALESCE(reps, 0) as reps_coalesced FROM exercises RIGHT OUTER JOIN user_reps ON (exercises.exercise_name = user_reps.exercise_name) WHERE user_id=?', (user_id,))
+        cursor.execute("""
+            SELECT exercises.exercise_name, COALESCE(reps, 0)
+            FROM
+                exercises LEFT JOIN
+                (SELECT * FROM user_reps where user_id=?) ur
+                ON ur.exercise_name = exercises.exercise_name
+            """, (user_id,))
         return {exercise: reps for (exercise, reps) in cursor.fetchall()}
 
     def get_user_reps_for_exercise(self, user_id, exercise):
@@ -50,8 +62,11 @@ class BotDB:
 
     def get_user_todo_reps(self, user_id):
         max_reps = self.get_max_reps()
-        user_reps = self.get_user_reps()
-        return {exercise: max_reps - user_reps for exercise in max_reps}
+        user_reps = self.get_user_reps(user_id)
+        return {exercise: max_reps[exercise] - user_reps[exercise] for exercise in max_reps}
+
+    def get_user_todo_reps_for_exercise(self, user_id, exercise):
+        return self.get_user_todo_reps(user_id)[exercise]
 
     def add_to_user_reps(self, user_id, exercise, reps):
         cursor = self.conn.cursor()
@@ -77,6 +92,11 @@ class BotDB:
         cursor.execute('INSERT INTO exercises (exercise_name, exercise_link) VALUES (?, ?)', (exercise, link))
         cursor.execute('INSERT INTO exercise_aliases (exercise_alias, exercise_name) VALUES (?, ?)', (exercise, exercise))
         self.conn.commit()
+
+    def get_exercises(self):
+        cursor = self.conn.cursor()
+        cursor.execute('SELECT exercise_name, exercise_link FROM exercises')
+        return {exercise: {'link' : link} for exercise, link in cursor.fetchall()}
 
     def add_alias(self, alias, exercise):
         cursor = self.conn.cursor()

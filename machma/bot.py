@@ -98,16 +98,18 @@ async def add_reps(message: types.Message):
         await message.answer('Zu viele Argumente, du Otto.')
     else:
         try:
-            exercise = args[1]
+            exercise_alias = args[1]
+            exercise = bot_db.get_exercise_by_alias(exercise_alias)
             reps = int(args[0])
+
             from_user = message['from']
-            if not bot_db.has_user(from_user['id']):
-                add_user(from_user)
-            if not bot_db.has_exercise(exercise):
-                await message.answer('Die Übung {} existiert nicht.'.format(exercise))
+            add_user(from_user)
+
+            if exercise is None:
+                await message.answer('Die Übung {} existiert nicht.'.format(exercise_alias))
             else:
                 todo = bot_db.get_user_todo_reps_for_exercise(from_user['id'], exercise)
-                bot_db.add_to_user_reps(from_user['id'], bot_db.get_exercise_by_alias(exercise), reps)
+                bot_db.add_to_user_reps(from_user['id'], exercise, reps)
                 if reps > todo:
                     user_href = tg_href(from_user['id'], from_user['first_name'])
                     await message.answer('{} weitere {} von {}.'.format(reps - todo, html.escape(exercise), user_href), parse_mode = 'html')

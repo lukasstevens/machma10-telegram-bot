@@ -79,7 +79,7 @@ class BotDB:
     def get_exercise_by_alias(self, alias):
         cursor = self.conn.cursor()
         cursor.execute('SELECT exercise_name FROM exercise_aliases WHERE exercise_alias=?', (alias,))
-        return cursor.fetchone()
+        return cursor.fetchone()[0]
 
     def has_alias(self, alias):
         return self.get_exercise_by_alias(alias) is not None

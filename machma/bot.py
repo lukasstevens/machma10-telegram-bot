@@ -107,7 +107,7 @@ async def add_reps(message: types.Message):
                 await message.answer('Die Übung {} existiert nicht.'.format(exercise))
             else:
                 todo = bot_db.get_user_todo_reps_for_exercise(from_user['id'], exercise)
-                bot_db.add_to_user_reps(from_user['id'], exercise, reps)
+                bot_db.add_to_user_reps(from_user['id'], bot_db.get_exercise_by_alias(exercise), reps)
                 if reps > todo:
                     user_href = tg_href(from_user['id'], from_user['first_name'])
                     await message.answer('{} weitere {} von {}.'.format(reps - todo, html.escape(exercise), user_href), parse_mode = 'html')

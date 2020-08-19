@@ -10,9 +10,9 @@ CREATE TABLE exercise_aliases (
 
 CREATE TABLE users (
     user_id INTEGER PRIMARY KEY NOT NULL,
-    user_name TEXT NOT NULL,
+    user_name TEXT NULL,
     first_name TEXT NOT NULL, 
-    last_name TEXT NOT NULL
+    last_name TEXT NULL
 );
 
 CREATE TABLE user_reps (

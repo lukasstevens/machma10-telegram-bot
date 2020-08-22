@@ -18,15 +18,17 @@ bot_db = BotDB('./bot.db')
 @dp.message_handler(commands=['help', 'hilfe', 'commands', 'befehle'])
 async def send_help(message: types.Message):
     commands = [
-        ('/help', 'Befehlsübersicht'),
-        ('/übung\n\t[name] [link]?', 'Neue Übung mit\noptionalem\nLink'),
-        ('/alias\n\t[alias] [übung]', 'Alias für\nÜbung'),
+        ('/help', 'Diese Hilfe'),
+        ('/übung [name] [link]?', 'Neue Übung mit optionalem Link'),
+        ('/alias\n\t[alias] [übung]', 'Alias für eine Übung'),
         ('/todos', 'Deine Todos'),
-        ('/done\n\t[zahl] [übung]', 'Wiederholungen\nanrechnen'),
+        ('/done\n\t[zahl] [übung]', 'Wiederholungen anrechnen'),
         ('/übungen', 'Übungsübersicht')
         ]
-    table = tabulate(commands, headers=['Befehl', 'Beschreibung'])
-    await message.answer('<pre>{}</pre>'.format(html.escape(table)), parse_mode = 'html')
+    table = '<b>Hilfe</b>'
+    for command, description in commands:
+        table += '\n\n' + html.escape(command) + '\n' + html.escape(description)
+    await message.answer(table, parse_mode = 'html')
 
 @dp.message_handler(commands=['exercise', 'übung'])
 async def add_exercise(message: types.Message):

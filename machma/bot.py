@@ -19,10 +19,10 @@ bot_db = BotDB('./bot.db')
 async def send_help(message: types.Message):
     commands = [
         ('/help', 'Befehlsübersicht'),
-        ('/übung\n\t[name] [link]?', 'Neue Übung mit\noptionalem Link'),
-        ('/alias\n\t[alias] [übung]', 'Alias für Übung'),
+        ('/übung\n\t[name] [link]?', 'Neue Übung mit\noptionalem\nLink'),
+        ('/alias\n\t[alias] [übung]', 'Alias für\nÜbung'),
         ('/todos', 'Deine Todos'),
-        ('/done\n\t[zahl] [übung]', 'Wiederholungen anrechnen'),
+        ('/done\n\t[zahl] [übung]', 'Wiederholungen\nanrechnen'),
         ('/übungen', 'Übungsübersicht')
         ]
     table = tabulate(commands, headers=['Befehl', 'Beschreibung'])

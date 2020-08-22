@@ -47,7 +47,7 @@ async def add_exercise(message: types.Message):
 
 @dp.message_handler(commands=['alias'])
 async def add_alias(message: types.Message):
-    args = message.get_args().strip().split(' ')
+    args = message.get_args().strip().split()
 
     if len(args) < 2:
         await message.answer('Zu wenig Argumente, du Otto.')
@@ -91,7 +91,7 @@ async def show_todos(message: types.Message):
 
 @dp.message_handler(commands=['machma', 'getan', 'done'])
 async def add_reps(message: types.Message):
-    args = message.get_args().strip().split(' ')
+    args = message.get_args().strip().split()
 
     if len(args) < 2:
         await message.answer('Zu wenig Argumente, du Otto.')

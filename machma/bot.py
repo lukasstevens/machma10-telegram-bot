@@ -44,6 +44,7 @@ async def add_exercise(message: types.Message):
         else:
             link = args[1] if len(args) > 1 else None
             bot_db.add_exercise(exercise, link=link)
+            await message.answer('Ich kenne jetzt die Übung {}.'.format(exercise))
 
 @dp.message_handler(commands=['alias'])
 async def add_alias(message: types.Message):

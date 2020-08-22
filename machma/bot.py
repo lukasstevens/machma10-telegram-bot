@@ -83,7 +83,7 @@ async def show_todos(message: types.Message):
     todos = bot_db.get_user_todo_reps(from_user['id'])
     dones = bot_db.get_user_reps(from_user['id'])
 
-    stats = [(textwrap.fill(ex, width=15), todos[ex], dones[ex]) for ex in todos]
+    stats = [(textwrap.fill(ex, width=12), todos[ex], dones[ex]) for ex in todos]
     table = '<pre>' + html.escape(tabulate(stats, headers=['Übung', 'Todo', 'Done'])) + '</pre>'
     header = '<b>Todos für {}</b>\n\n'.format(tg_href(from_user['id'], from_user['first_name']))
     await message.answer(header + table, parse_mode = "html")
@@ -122,7 +122,7 @@ async def show_exercises(message : types.Message):
     exercises = bot_db.get_exercises()
     table = []
     for ex in exercises:
-        exercise = html.escape(textwrap.fill(ex, width=15))
+        exercise = html.escape(ex)
         link = exercises[ex]['link']
         table.append(('<a href="{}">{}</a>'.format(link, exercise) if link is not None else exercise,))
     await message.answer(tabulate(table, headers=['Übung']), parse_mode = 'html', disable_web_page_preview=True)
